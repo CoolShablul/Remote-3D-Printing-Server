@@ -1,0 +1,18 @@
+{
+  "name": "3dprinting",
+  "version": "1.0.0",
+  "description": "create a server side Api service that recives a Post request with gcode file, using OctoPrint to configure",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "ts-node src/server.ts"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/node": "^22.10.0",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.7.2"
+  }
+}
