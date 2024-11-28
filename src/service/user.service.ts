@@ -1,29 +1,29 @@
-interface User {
-    id: number,
-    email: string,
-    userName: string,
-    password: string,
+import bcrypt from 'bcryptjs';
+import { createUser, getUserByUserName } from './user.store';
+import { generateToken } from '../utils/jwt.util';
+
+export const registerUser = async (userName: string, email: string, password: string) => {
+    // check if userName and email already exists
+    if( getUserByUserName(userName)) {
+        throw new Error('UserName already exists!')
+    }
+
+    // hash the password and add the user info to memory
+    const hashedPassword = await bcrypt.hash(password, 10);
+    return createUser( email, userName, hashedPassword);
 }
 
-let users: User[] = [];
-let userIdCounter = 0;
+export const loginUser = async (userName: string, password: string) => {
+    // find user
+    const user = getUserByUserName(userName);
+    if(!user) throw new Error('user not found!');
 
-export const getAllUsers = (): User[] => {
-    return users;
-}
+    // validate password
+    const isPasswordValid = await bcrypt.compare(password, user.password);
+    if(!isPasswordValid) throw new Error('Invalid credentials');
 
-export const getUserByUserName = (userName: string): User | undefined => {
-    return users.find((user) => user.userName === userName);
-}
+    // generate jwt
+    const token = generateToken(user.id);
 
-export const createUser = (email: string, userName: string, password: string): User => {
-    const user: User = {
-        id: userIdCounter,
-        email,
-        userName,
-        password
-    };
-    users.push(user);
-    userIdCounter++;
-    return user;
+    return {user, token};
 }
