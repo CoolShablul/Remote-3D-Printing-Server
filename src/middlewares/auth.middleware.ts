@@ -3,10 +3,10 @@ import { validateToken } from '../utils/jwt.util';
 
 export const authenticate = (req: Request, res: Response, next: NextFunction) => {
     const token = req.header('Authorization')?.split(' ')[1];
-    if (!token) return res.status(401).json({ error: 'Unauthorized' });
+    if (!token) res.status(401).json({ error: 'Unauthorized' });
 
     try {
-        const decoded = validateToken(token);
+        const decoded = validateToken(token || '');
         (req as any).user = decoded;
         next();
     } catch (error) {
