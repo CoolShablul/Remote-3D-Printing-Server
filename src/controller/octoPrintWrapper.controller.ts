@@ -1,4 +1,4 @@
-import express, { Request, Response } from "express";
+import { Request, Response } from "express";
 import multer from "multer";
 
 
@@ -33,6 +33,9 @@ export const printStlFile = (req: Request, res: Response) =>{
     const upload = multer({ dest: "uploads/" });
 
     const stlFile = req.file;
+    if (!stlFile){
+        throw new Error("Failed to extract stl file from request body")
+    }
     upload.single(stlFile)
     const slicerSettings = req.body.slicerSettings ? JSON.parse(req.body.slicerSettings) : {};
 
