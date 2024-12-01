@@ -3,7 +3,7 @@ import { createUser, getUserByUserName } from './user.store';
 import { generateToken } from '../utils/jwt.util';
 
 export const registerUser = async (userName: string, email: string, password: string) => {
-    // check if userName and email already exists
+    // check if userName already exists
     if( getUserByUserName(userName)) {
         throw new Error('UserName already exists!')
     }
