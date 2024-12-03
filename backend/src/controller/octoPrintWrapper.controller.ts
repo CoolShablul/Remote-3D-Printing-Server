@@ -1,5 +1,4 @@
 import { Request, Response } from "express";
-import multer from "multer";
 import {sendWarmUpHotendTempRequest, sendWarmUpBedTempRequest, sendOctoPrintSTLRequest } from "../service/octroPrintWrapper.service"
 
 
@@ -37,17 +36,20 @@ export const warmPrinterHotend = async (req: Request, res: Response) =>{
 
 
 
-export const printStlFile = (req: Request, res: Response) =>{
+export const printStlFile = async (req: Request, res: Response) =>{
     const stlFile = req.file;
     if (!stlFile){
         res.status(400).json({ error: "STL file not found" });
         throw new Error("Failed to extract stl file from request body")
     }
     const slicerSettings = req.body.slicerSettings ? JSON.parse(req.body.slicerSettings) : {};
+    
 
     // Logic to handle STL file and slicer settings
     console.log(`Received STL file: ${stlFile.originalname}`);
     console.log("Slicer settings:", slicerSettings);
+
+    const octoResponse = await sendOctoPrintSTLRequest(stlFile, slicerSettings);
 
     res.status(200).json({
         message: "STL file received. Printing initiated.",
