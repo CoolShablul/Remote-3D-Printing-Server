@@ -1,10 +1,12 @@
 import { Router } from 'express';
-import authRoutes from './userAuth.route';
+import authRoute from './userAuth.route';
+import octoRoute from './octoPrintWrapper.route';
 
 const router = Router();
 
 // Combine all route modules
-router.use('/auth', authRoutes); // Routes for authentication
+router.use('/auth', authRoute); // Routes for authentication
+router.use('/printer', octoRoute)
 // router.use('/users', userRoutes); // Routes for user-related operations
 // router.use('/products', productRoutes); // Routes for products
 
