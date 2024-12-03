@@ -48,8 +48,16 @@ export const printStlFile = async (req: Request, res: Response) =>{
     // Logic to handle STL file and slicer settings
     console.log(`Received STL file: ${stlFile.originalname}`);
     console.log("Slicer settings:", slicerSettings);
-
-    const octoResponse = await sendOctoPrintSTLRequest(stlFile, slicerSettings);
+    try{
+        sendOctoPrintSTLRequest(stlFile, slicerSettings);
+    }
+    catch (error : any){
+        console.error("Error processing print request:", error.message);
+        res.status(500).json({
+            error: "Failed to process print request. Please check the logs for more details.",
+            details: error.message,
+        })
+    }
 
     res.status(200).json({
         message: "STL file received. Printing initiated.",

@@ -28,37 +28,21 @@ export const sendWarmUpHotendTempRequest = async (target : number) => {
  * Route to upload an STL file and slicer settings, slice it, and send a print command to OctoPrint
  */
 export const sendOctoPrintSTLRequest = async (stlFile : any, slicerSettings : any) => {
-    try {
-        // Ensure gcode output directory exists
-        if (!fs.existsSync("sliced")) {
-            fs.mkdirSync("sliced");
-        }
-        const gcodePath = path.join("sliced", `${path.basename(stlFile.originalname, ".stl")}.gcode`); // Path for the output G-code
-        await sliceCommand(stlFile, slicerSettings, gcodePath);
-
-        // Upload the G-code to OctoPrint
-        const gcodeUploadResponse = await uploadGCodeToOctoPrint(gcodePath);
-        console.log("G-code uploaded to OctoPrint container:", gcodeUploadResponse);
-
-        // Issue the print command to OctoPrint
-        const printResponse = await issuePrintCommand(gcodeUploadResponse.name);
-        console.log("Print command issued successfully:", printResponse);
-
-        res.status(200).json({
-            message: "STL sliced and print command issued successfully.",
-            gcodeFile: gcodeUploadResponse.name,
-        });
-    } catch (error: any) {
-        console.error("Error processing print request:", error.message);
-        res.status(500).json({
-            error: "Failed to process print request. Please check the logs for more details.",
-            details: error.message,
-        });
-    } finally {
-        // Cleanup uploaded files if needed
-        fs.unlink(stlFile.path, () => {});
+    // Ensure gcode output directory exists
+    if (!fs.existsSync("sliced")) {
+        fs.mkdirSync("sliced");
     }
-};
+    const gcodePath = path.join("sliced", `${path.basename(stlFile.originalname, ".stl")}.gcode`); // Path for the output G-code
+    await sliceCommand(stlFile, slicerSettings, gcodePath);
+
+    // Upload the G-code to OctoPrint
+    const gcodeUploadResponse = await uploadGCodeToOctoPrint(gcodePath);        //TODO: returning data - later used for refferencing the gcode inside octoprint container
+    console.log("G-code uploaded to OctoPrint container:", gcodeUploadResponse);
+
+    // Issue the print command to OctoPrint
+    const printResponse = await issuePrintCommand(gcodeUploadResponse.name);
+    console.log("Print command issued successfully:", printResponse);
+}
 
 /**
  * Execute a shell command and return a promise.
