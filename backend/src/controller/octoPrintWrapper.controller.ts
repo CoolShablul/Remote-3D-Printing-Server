@@ -38,6 +38,7 @@ export const warmPrinterHotend = async (req: Request, res: Response) =>{
 
 export const printStlFile = async (req: Request, res: Response) =>{
     const stlFile = req.file;
+    console.log("controller started~!");
     if (!stlFile){
         res.status(400).json({ error: "STL file not found" });
         throw new Error("Failed to extract stl file from request body")

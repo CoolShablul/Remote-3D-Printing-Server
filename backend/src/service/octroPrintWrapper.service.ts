@@ -4,7 +4,6 @@ import fs from "fs";
 import path from "path";
 import {sendOctoPrintPostRequest} from "../utils/octoPrint.utils";
 
-
 export const sendWarmUpBedTempRequest = async (target : number) => {
     const options = {
         "command": "target",
@@ -27,7 +26,8 @@ export const sendWarmUpHotendTempRequest = async (target : number) => {
 /**
  * Route to upload an STL file and slicer settings, slice it, and send a print command to OctoPrint
  */
-export const sendOctoPrintSTLRequest = async (stlFile : any, slicerSettings : any) => {
+export const sendOctoPrintSTLRequest = async (stlFile : Express.Multer.File, slicerSettings : any) => {
+    console.log("service started!");
     // Ensure gcode output directory exists
     if (!fs.existsSync("sliced")) {
         fs.mkdirSync("sliced");
@@ -49,9 +49,7 @@ export const sendOctoPrintSTLRequest = async (stlFile : any, slicerSettings : an
  */
 const sliceCommand = (stlFile: any, slicerSettings : any, gcodePath : string): Promise<void> => {
 
-    // const jsonSettings = JSON.parse(fs.readFileSync(slicerSettings, "utf-8"));
-
-    // Convert JSON settings to Slic3r CLI arguments
+    // Convert JSON settings to Slicer CLI arguments
     const overrideSettings = Object.entries(slicerSettings)
         .map(([key, value]) => `--${key}=${value}`)
         .join(" ");
@@ -109,6 +107,5 @@ const issuePrintCommand = async (gcodeFilename: string) => {
             "x-api-key": process.env.OCTOPRINT_API_KEY,
         },
     });
-
     return response.data;
 };
