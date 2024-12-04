@@ -2,6 +2,7 @@ import { exec } from "child_process";
 import axios from "axios";
 import fs from "fs";
 import path from "path";
+import FormData from 'form-data';
 import {sendOctoPrintPostRequest} from "../utils/octoPrint.utils";
 
 export const sendWarmUpBedTempRequest = async (target : number) => {
@@ -9,7 +10,7 @@ export const sendWarmUpBedTempRequest = async (target : number) => {
         "command": "target",
         "target": target
     }
-    return await sendOctoPrintPostRequest('http://localhost:5000/api/printer/bed', options);
+    return await sendOctoPrintPostRequest(`${process.env.OCTOPRINT_PATH_PREFIX}/api/printer/bed`, options);
 }
 
 
@@ -19,7 +20,7 @@ export const sendWarmUpHotendTempRequest = async (target : number) => {
         targets: {
             tool0: target
         }}
-    return await sendOctoPrintPostRequest('http://localhost:5000/api/printer/tool0', options);
+    return await sendOctoPrintPostRequest(`${process.env.OCTOPRINT_PATH_PREFIX}/printer/tool0`, options);
 }
 
 
@@ -40,7 +41,7 @@ export const sendOctoPrintSTLRequest = async (stlFile : Express.Multer.File, sli
     console.log("G-code uploaded to OctoPrint container:", gcodeUploadResponse);
 
     // Issue the print command to OctoPrint
-    const printResponse = await issuePrintCommand(gcodeUploadResponse.name);
+    const printResponse = await issuePrintCommand(gcodeUploadResponse.files.local.path);
     console.log("Print command issued successfully:", printResponse);
 }
 
@@ -54,8 +55,11 @@ const sliceCommand = (stlFile: any, slicerSettings : any, gcodePath : string): P
         .map(([key, value]) => `--${key}=${value}`)
         .join(" ");
 
+    console.log("slicer Settings:", slicerSettings)
+    console.log("stlFile:", stlFile)
+
     // Construct the full Slic3r command
-    const slicerCommand = `slic3r -s --load ${slicerSettings} ${stlFile} --output ${gcodePath} ${overrideSettings}`;
+    const slicerCommand = `slic3r -s --load ./config.ini ${stlFile.path} --output ${gcodePath} ${overrideSettings}`;
     console.log("Running slicer command:", slicerCommand);
     return new Promise((resolve, reject) => {
         exec(slicerCommand, (error, stdout, stderr) => {
@@ -74,31 +78,35 @@ const sliceCommand = (stlFile: any, slicerSettings : any, gcodePath : string): P
  * Upload G-code to OctoPrint.
  */
 const uploadGCodeToOctoPrint = async (gcodePath: string) => {
+    console.log("tometomer", gcodePath)
     const url = `${process.env.OCTOPRINT_PATH_PREFIX}/api/files/local`;
-    const fileStream = fs.createReadStream(gcodePath);
 
-    const response = await axios.post(url, fileStream, {
+    const formData = new FormData();
+    formData.append('file', fs.createReadStream(gcodePath));
+    formData.append('filename', path.basename(gcodePath));
+
+    const response = await axios.post(url, formData, {
         headers: {
-            "Content-Type": "application/octet-stream",
+            // "Content-Type": "multipart/form-data",
+            // "Content-Length": "",
+            ...formData.getHeaders(),
             "x-api-key": process.env.OCTOPRINT_API_KEY,
-        },
-        params: {
-            filename: path.basename(gcodePath),
         },
     });
     return response.data;
 };
 
+
+
 /**
  * Issue a print command to OctoPrint for the uploaded G-code file.
  */
 const issuePrintCommand = async (gcodeFilename: string) => {
-    const url = `${process.env.OCTOPRINT_PATH_PREFIX}/api/job`;
+    const url = `${process.env.OCTOPRINT_PATH_PREFIX}/api/files/local/${gcodeFilename}`;
 
     const payload = {
         command: "select",
         print: true,
-        file: `local/${gcodeFilename}`, // Path to the uploaded file in OctoPrint
     };
 
     const response = await axios.post(url, payload, {
