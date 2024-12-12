@@ -19,12 +19,6 @@ const PrintSTL = () => {
   }
 
   const [printerConfig, setPrinterConfig ] = useState({
-    nozzle_temperature: '',
-    bed_temperature: '',
-    infill_percentage: '',
-    infill_pattern: '',
-    adhesion_type: '',
-    support_type: ''
   })
 
   const handleSave = () => {
@@ -78,10 +72,10 @@ const PrintSTL = () => {
                       <Form.Control
                           placeholder="Nozzle Temperature"
                           type="text"
-                          value={printerConfig.nozzle_temperature}
+                          value={printerConfig.temperature}
                           onChange={(e) => setPrinterConfig(printerConfig => ({
                             ...printerConfig,
-                            nozzle_temperature: e.target.value
+                            temperature: e.target.value
                               }))}
                       />
                     </Form.Group>
@@ -92,10 +86,10 @@ const PrintSTL = () => {
                       <Form.Control
                           className="bed-temperature-input"
                           type="text"
-                          value={printerConfig.bed_temperature}
+                          value={printerConfig['bed-temperature']}
                           onChange={(e) => setPrinterConfig(printerConfig => ({
                             ...printerConfig,
-                            bed_temperature: e.target.value
+                            'bed-temperature': e.target.value
                           }))}
                           placeholder="Bed Temperature"
                       />
@@ -107,10 +101,10 @@ const PrintSTL = () => {
                       <Form.Control
                           className="infill-percentage-input"
                           type="text"
-                          value={printerConfig.infill_percentage}
+                          value={printerConfig[fill-percentage]}
                           onChange={(e) => setPrinterConfig(printerConfig => ({
                             ...printerConfig,
-                            infill_percentage: e.target.value
+                            'fill-percentage' : e.target.value
                           }))}
                           placeholder="Infill Percentage"
                       ></Form.Control>
@@ -121,10 +115,10 @@ const PrintSTL = () => {
                   <Col className="pr-1" md="6">
                     <label>Infill Pattern:</label>
                     <Form.Select aria-label="infill pattern"
-                      value={printerConfig.infill_pattern}
+                      value={printerConfig[fill-pattern]}
                       onChange={(e) => setPrinterConfig(printerConfig => ({
                       ...printerConfig,
-                      infill_pattern: e.target.value
+                      'fill-pattern' : e.target.value
                     }))}
                     >
                       <option value="rectilinear">Rectilinear</option>
@@ -138,10 +132,10 @@ const PrintSTL = () => {
                     <label>Adhesion Type: </label>
                     <Form.Select className="infill-pattern">
                         className="adhesion-type-dropdown"
-                        value={printerConfig.adhesion_type}
+                        value={printerConfig[brim-type]}
                         onChange={(e) => setPrinterConfig(printerConfig => ({
                         ...printerConfig,
-                        adhesion_type: e.target.value
+                        'brim-type' : e.target.value
                     }))}
                         <option value="none">None</option>
                         <option value="skirt">Skirt</option>
