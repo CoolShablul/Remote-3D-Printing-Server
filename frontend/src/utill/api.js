@@ -38,6 +38,20 @@ export const warmPrinterHead = (data) => api.post('/printer/hotend/warm', data);
 
 export const warmPrinterBed = (data) => api.post('/printer/bed/warm', data);
 
-export const uploadFileAndPrint = (data) => api.post('/printer/print', data);
+export const uploadFileAndPrint = (slicerSettings, stlFile) => {
+    let formData = new FormData();
+    const file = stlFile;
+    formData.append('stlFile', file)
+    formData.append('slicerSettings', JSON.stringify(slicerSettings))
+    return api.post('/printer/print',
+        formData,
+        {
+        headers : {
+            'Content-Type': 'multipart/form-data'
+        },
+    })
+
+    ;
+}
 
 export default api;
