@@ -27,8 +27,10 @@ export const sendWarmUpHotendTempRequest = async (target : number) => {
 /**
  * Route to upload an STL file and slicer settings, slice it, and send a print command to OctoPrint
  */
-export const sendOctoPrintSTLRequest = async (stlFile : Express.Multer.File, slicerSettings : any) => {
-    console.log("service started!");
+export const sendOctoPrintSTLRequest = async (stlFile : Express.Multer.File | undefined, slicerSettings : any) => {
+    if (!stlFile){
+        throw new Error('File not found!')
+    }
     // Ensure gcode output directory exists
     if (!fs.existsSync("sliced")) {
         fs.mkdirSync("sliced");
@@ -78,22 +80,23 @@ const sliceCommand = (stlFile: any, slicerSettings : any, gcodePath : string): P
  * Upload G-code to OctoPrint.
  */
 const uploadGCodeToOctoPrint = async (gcodePath: string) => {
-    console.log("tometomer", gcodePath)
     const url = `${process.env.OCTOPRINT_PATH_PREFIX}/api/files/local`;
 
     const formData = new FormData();
     formData.append('file', fs.createReadStream(gcodePath));
     formData.append('filename', path.basename(gcodePath));
 
-    const response = await axios.post(url, formData, {
-        headers: {
-            // "Content-Type": "multipart/form-data",
-            // "Content-Length": "",
-            ...formData.getHeaders(),
-            "x-api-key": process.env.OCTOPRINT_API_KEY,
-        },
-    });
-    return response.data;
+    try {
+        const response = await axios.post(url, formData, {
+            headers: {
+                ...formData.getHeaders(),
+                "x-api-key": process.env.OCTOPRINT_API_KEY,
+            },
+        });
+        return response.data;
+    } catch (error) {
+        throw new Error('Problem with uploading file.')
+    }
 };
 
 
@@ -108,12 +111,15 @@ const issuePrintCommand = async (gcodeFilename: string) => {
         command: "select",
         print: true,
     };
-
-    const response = await axios.post(url, payload, {
-        headers: {
-            "Content-Type": "application/json",
-            "x-api-key": process.env.OCTOPRINT_API_KEY,
-        },
-    });
-    return response.data;
+    try {
+        const response = await axios.post(url, payload, {
+            headers: {
+                "Content-Type": "application/json",
+                "x-api-key": process.env.OCTOPRINT_API_KEY,
+            },
+        });
+        return response.data;
+    } catch (error: any) {
+        throw new Error(`problem with issue a print command:  ${error?.response.message}`);
+    }
 };
