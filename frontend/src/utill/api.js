@@ -38,6 +38,7 @@ export const warmPrinterHead = (data) => api.post('/printer/hotend/warm', data);
 
 export const warmPrinterBed = (data) => api.post('/printer/bed/warm', data);
 
+
 export const uploadFileAndPrint = (slicerSettings, stlFile) => {
     let formData = new FormData();
     const file = stlFile;

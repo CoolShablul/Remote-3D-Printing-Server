@@ -1,0 +1,27 @@
+version: '3.8'
+
+services:
+  app:
+    build: .
+    ports:
+      - "4000:4000"
+    environment:
+      - NODE_ENV=production
+    depends_on:
+      - octoprint
+
+  octoprint:
+    image: octoprint/octoprint
+    container_name: octoprint
+    restart: unless-stopped
+    ports:
+      - "5001:5000"
+    volumes:
+      - octoprint_data:/octoprint
+    devices:
+      - "/dev/ttyUSB0:/dev/ttyUSB0"
+    environment:
+      - ENABLE_MJPG_STREAMER=true
+
+volumes:
+  octoprint_data:

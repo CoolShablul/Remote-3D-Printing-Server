@@ -11,18 +11,18 @@ const PrintSTL = () => {
 
   const [inputType, setInputType] = useState('form');
   const [customSettings, setCustomSettings] = useState('');
+  const [printerConfig, setPrinterConfig ] = useState({})
 
 
   const UploadButton = () => {
     document.getElementById('fileInput').click();
-  };
 
+  };
   const handleFileChange = (event) => {
     const file = event.target.files[0];
     setFile(file);
-  }
 
-  const [printerConfig, setPrinterConfig ] = useState({})
+  }
 
   const handleSave = () => {
     const lines = customSettings.split('\n'); // Split input by lines

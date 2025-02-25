@@ -4,17 +4,18 @@ import {sendWarmUpHotendTempRequest, sendWarmUpBedTempRequest, sendOctoPrintSTLR
 
 export const warmPrinterBed = async (req: Request, res: Response) => {
     const { temperature } = req.body;
+    console.log(`warmup bed to: ${temperature}`);
     if (typeof temperature !== "number" || temperature < 0) {
-        res.status(400).json({ error: "Invalid or missing temperature." });
-    }
+        res.status(403).json({ error: "Invalid or missing temperature." });
+    } else {
+        // Logic to warm the printer bed
+        try {
+            await sendWarmUpBedTempRequest(temperature)
+            res.status(200).json({message: `Printer bed temperature action set and started`});
 
-    // Logic to warm the printer bed
-    try {
-        await sendWarmUpBedTempRequest(temperature)
-        res.status(200).json({ message: `Printer bed temperature action set and started` });
-
-    } catch (error) {
-        res.status(409).json({ message: 'Conflict with Printer bed warmup action command '})
+        } catch (error) {
+            res.status(409).json({message: 'Conflict with Printer bed warmup action command '})
+        }
     }
 }
 
@@ -23,6 +24,7 @@ export const warmPrinterHotend = async (req: Request, res: Response) =>{
 
     if (typeof temperature !== "number" || temperature < 0) {
         res.status(400).json({ error: "Invalid or missing temperature." });
+        return;
     }
 
     // Logic to warm the printer head
