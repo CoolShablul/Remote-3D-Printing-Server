@@ -52,7 +52,7 @@ npm install
 npm start
 ```
 
-By default, the server runs on **http://localhost:3000**.
+By default, the server runs on **http://localhost:4000**.
 
 ---
 
@@ -70,10 +70,10 @@ To run the server in a Docker container:
 
 2. **Run the container:**
    ```sh
-   docker run -d -p 3000:3000 --name printer-server remote-3d-printing-server
+   docker run -d -p 4000:4000 --name printer-server remote-3d-printing-server
    ```
 
-The server will now be accessible at `http://localhost:3000`.
+The server will now be accessible at `http://localhost:4000`.
 
 ---
 
@@ -81,7 +81,7 @@ The server will now be accessible at `http://localhost:3000`.
 
 | Environment Variable | Default | Description                        |
 | -------------------- | ------- | ---------------------------------- |
-| `PORT`              | 3000    | Server listening port             |
+| `PORT`              |  4000    | Server listening port             |
 | `PRINTER_PORT`      | `/dev/ttyUSB0` | Serial port for 3D printer |
 | `SLICER`            | `cura`  | Default slicing tool              |
 
