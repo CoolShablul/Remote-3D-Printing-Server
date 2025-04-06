@@ -39,4 +39,4 @@ ENV PORT=4000
 EXPOSE 4000
 
 # Start the backend server
-CMD ["node", "./backend/dist/routes/index.ts"]
+CMD ["npx", "ts-node", "src/server.ts"]
